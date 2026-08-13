@@ -118,6 +118,21 @@
   .card p{font-size:.95rem;opacity:.88}
   .card .origin{display:block;margin-top:12px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;opacity:.6}
 
+  /* ---- galería ---- */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:36px}
+  .gallery figure{
+    margin:0;border-radius:18px;overflow:hidden;
+    border:1px solid rgba(233,217,188,.16);
+    aspect-ratio:1;background:var(--space-deep);
+  }
+  .gallery img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    transition:transform .4s ease;
+  }
+  .gallery figure:hover img{transform:scale(1.05)}
+  .gallery-credit{margin-top:14px;font-size:.78rem;opacity:.55}
+  .gallery-credit a{color:var(--copper);text-decoration:none}
+
   /* ---- visita ---- */
   .visit{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
   .info-line{display:flex;gap:14px;margin-bottom:22px;align-items:flex-start}
@@ -174,6 +189,7 @@
   <div class="logo">SPACE<span>CAFÉ</span></div>
   <nav aria-label="principal">
     <a href="#cafes">Nuestros cafés</a>
+    <a href="#galeria">Galería</a>
     <a href="#visita">Visítanos</a>
   </nav>
 </header>
@@ -221,6 +237,18 @@
     </div>
   </section>
 
+  <section id="galeria" class="reveal">
+    <p class="sec-eyebrow">Desde nuestra barra</p>
+    <h2>Directo del espacio</h2>
+    <p class="lead">Un vistazo a lo que preparamos cada día en San Isidro.</p>
+    <div class="gallery">
+      <figure><img src="fotos/producto-1.jpg" alt="Producto de Space Café"></figure>
+      <figure><img src="fotos/producto-2.jpg" alt="Producto de Space Café"></figure>
+      <figure><img src="fotos/producto-3.jpg" alt="Producto de Space Café"></figure>
+    </div>
+    <p class="gallery-credit">Fotos: <a href="https://instagram.com/spacecafeperu" target="_blank" rel="noopener">@spacecafeperu</a></p>
+  </section>
+
   <section id="visita" class="reveal">
     <p class="sec-eyebrow">Base de aterrizaje</p>
     <h2>Visítanos</h2>
@@ -255,6 +283,27 @@
 </a>
 
 <script>
+  // galería: oculta las fotos que fallen; si fallan todas, oculta la sección completa
+  (function(){
+    const gal=document.getElementById('galeria');
+    if(!gal) return;
+    const imgs=Array.from(gal.querySelectorAll('img'));
+    let fallidas=0;
+    imgs.forEach(img=>{
+      function markError(){
+        const fig=img.closest('figure');
+        if(fig) fig.remove();
+        fallidas++;
+        if(fallidas===imgs.length) gal.hidden=true;
+      }
+      if(img.complete && img.naturalWidth===0){
+        markError();
+      } else {
+        img.addEventListener('error', markError);
+      }
+    });
+  })();
+
   // estrellas
   const sky=document.getElementById('sky');
   for(let i=0;i<90;i++){
@@ -264,6 +313,7 @@
     s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
     sky.appendChild(s);
   }
+
   // reveal on scroll
   const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
